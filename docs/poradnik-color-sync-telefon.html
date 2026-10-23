@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Color-sync dwóch ekranów bez kalibratora — z AI w telefonie</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Charter", "Georgia", "Times New Roman", serif;
+    font-size: 10.5pt; line-height: 1.45; color: #111;
+    margin: 0; background: #fff;
+  }
+  .kicker {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 8pt; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #666; margin-bottom: 2mm;
+  }
+  h1 { font-size: 19pt; line-height: 1.15; margin: 0 0 2mm 0; font-weight: 700; }
+  .lead { font-size: 10.5pt; color: #333; margin: 0 0 6mm 0; }
+  h2 {
+    font-size: 11.5pt; margin: 6mm 0 2mm 0; padding-bottom: 1mm;
+    border-bottom: 0.5pt solid #999;
+  }
+  ul, ol { margin: 1mm 0 3mm 0; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  code {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 8.8pt; background: #f2f2f0; padding: 0.4mm 1.2mm;
+    border-radius: 2px;
+  }
+  .box {
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 8.6pt; line-height: 1.5; white-space: pre-wrap;
+    background: #f6f6f4; border: 0.5pt solid #bbb;
+    border-left: 2pt solid #444; padding: 3mm 4mm; margin: 2mm 0 4mm 0;
+  }
+  .warn {
+    border-left: 2pt solid #b00; padding: 1.5mm 0 1.5mm 3mm; margin: 2mm 0;
+  }
+  .files { font-size: 9pt; color: #444; }
+  .files td { padding: 1mm 3mm 1mm 0; vertical-align: top; }
+  .files code { background: none; }
+  .pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="kicker">Poradnik · 1 telefon · 0 zł</div>
+<h1>Color-sync dwóch ekranów<br>bez kalibratora, z AI w telefonie</h1>
+<p class="lead">Zestaw dwóch monitorów tak, żeby ta sama grafika wyglądała na obu identycznie —
+bez kalibratora sprzętowego. Telefon jest miernikiem, AI robi matematykę,
+Ty ruszasz tylko suwakami w menu monitora.</p>
+
+<h2>1 · Czego się spodziewać</h2>
+<ul>
+  <li><strong>Daje:</strong> zrównanie jasności i punktu bieli między ekranami (czyli to, co męczy oko, gdy rycina jest na jednym cieplejsza/ciemniejsza).</li>
+  <li><strong>Nie daje:</strong> gwarancji „prawdziwych" kolorów (sRGB/DCI). Do profesjonalnej pracy z foto — kalibrator hardware (~400–700 zł jednorazowo, program DisplayCAL jest darmowy).</li>
+  <li><strong>Czas:</strong> 15–20 minut na zestaw dwóch ekranów.</li>
+</ul>
+
+<h2>2 · Potrzebne</h2>
+<ul>
+  <li>2 ekrany + komputer;</li>
+  <li>telefon z aplikacją AI, która analizuje zdjęcia (ChatGPT / Claude / Gemini — dowolna, też darmowa);</li>
+  <li>wzorzec testowy: <code>wzorzec-color-sync-1920x1200.png</code> (plik w komplecie).</li>
+</ul>
+
+<h2>3 · Przygotowanie (jednorazowo)</h2>
+<ul>
+  <li>Na komputerze: <strong>True Tone OFF</strong>, <strong>Night Shift OFF</strong> (zniekształcają biel dynamicznie i zepsują pomiary).</li>
+  <li>W menu każdego monitora (OSD): <strong>Contrast 75</strong> (100 obcina biel), <strong>Sharpness 50</strong>, preset <strong>6500K</strong> jeśli jest, Brightness na oko tyle samo.</li>
+  <li class="warn"><strong>Dell i podobne:</strong> zmiana w menu wymaga potwierdzenia przyciskiem ✓ — samo zaznaczenie opcji nic nie ustawia. Najczęstszy powód „nic się nie zmienia".</li>
+</ul>
+
+<h2>4 · Pętla strojenia (2–3 rundy)</h2>
+<ol>
+  <li>Otwórz wzorzec PNG na <strong>pełnym ekranie</strong> tak, by widziały go oba monitory (np. okno rozciągnięte na oba albo podgląd zdjęcia na pełnym oknie).</li>
+  <li>Zrób <strong>jedno zdjęcie</strong>, w którym widać oba ekrany naraz. To klucz: ta sama ekspozycja = porównywalne liczby.</li>
+  <li>Wyślij zdjęcie do AI <strong>razem z gotowym promptem</strong> z punktu 5.</li>
+  <li>AI odpowie tabelą i poda konkretne liczby do wpisania w OSD. Wpisz, potwierdź ✓.</li>
+  <li>Powtórz zdjęcie. Stop po 2–3 rundach — cel to „dobrze", nie „idealnie".</li>
+</ol>
+
+<p><strong>Protokół zdjęcia — twarde zasady:</strong></p>
+<ul>
+  <li>żaden strumień światła nie pada na ekrany (zasłoń okno albo fotografuj od przeciwnej strony) — refleks dzienny robi różnicę 40+ punktów jasności w obrębie jednego ekranu i pomiar nadaje się do kosza;</li>
+  <li>telefon prostopadle do ekranów, na wysokości ich środka;</li>
+  <li>przytrzymaj <strong>AE/AF lock</strong> (zamek ekspozycji i ostrości) — bez tego każde zdjęcie jest inaczej naświetlone;</li>
+  <li>HDR off, menu monitora (OSD) poza kadrze.</li>
+</ul>
+
+<h2>5 · Gotowy prompt do AI (kopiuj-wklej)</h2>
+<div class="box">To zdjęcie dwóch monitorów z wyświetlonym wzorcem testowym.
+Górna połowa każdego ekranu to 11 pionowych pasów szarości od 0% do 100%,
+dolna połowa to 4 duże pola: 100% (biel), 50% (szarość), 25%, 0% (czerń).
+
+Zrób dla KAŻDEGO ekranu (nazwij je LEWY i PRAWY):
+1. Średnia jasność pola 100% (biel) — próbkuje tylko ze środka pola
+   (środkowe 40% powierzchni, pomiń krawędzie i sąsiedztwo pasów).
+2. Średnia jasność pola 50% — tak samo, ze środka.
+3. Z punktu bieli: czy LEWY jest cieplejszy (więcej R) czy zimniejszy
+   (więcej B) niż PRAWY, i o ile w procentach.
+
+Odpowiedz tabelą: ekran | biel (0–255) | 50% (0–255) | odcień bieli.
+Potem wnioski:
+- który ekran jest ciemniejszy i o ile %,
+- który cieplejszy/zimniejszy i o ile,
+- KONKRETNE liczby do wpisania w menu monitora (Brightness, ew. RGB gain
+  w trybie Custom Color), żeby ekrany się zrównały.
+Zasada: jaśniejszy ekran koryguj w DÓŁ (ciemniejszy może nie mieć zapasu
+w górę). Powiedz mi też, co mam zmienić najpierw, jedną zmianą na rundę.</div>
+
+<h2>6 · Gdy różnica jest większa niż OSD potrafi (Mac)</h2>
+<p>Menu monitora ma ograniczony zakres. Na Macu da się skorygować mocniej —
+programowo, przez gamma tables (ten sam mechanizm, czego używa f.lux).
+Działa też przez dock, gdzie klasyczne sterowanie DDC/CI zwykle nie działa.
+Skrypt <code>colorsync.py</code> jest w komplecie — nie musisz umieć programować,
+AI poprowadzi krok po kroku, Ty tylko wklejasz do Terminalu:</p>
+<ol>
+  <li>Instalacja (jednorazowo): <code>pip3 install pyobjc-framework-Quartz</code></li>
+  <li>Lista ekranów: <code>python3 ~/Downloads/colorsync.py list</code></li>
+  <li>Korekta (mnożniki 0–1 poda AI z pomiaru; najpierw <code>--dry-run</code>):<br>
+      <code>python3 ~/Downloads/colorsync.py apply 3 --rgb 0.93 0.93 0.91</code><br>
+      Numer ekranu zweryfikuj wzrokiem: nałóż lekkie przyciemnienie
+      (<code>--rgb 0.55 0.55 0.55</code>), zobacz, który ekran zgasł, <code>reset</code> — i masz pewność mapowania.</li>
+  <li>Cofnięcie: <code>reset 3</code> albo <code>reset all</code>. Stan: <code>status</code>.</li>
+</ol>
+<p class="warn"><strong>Ważne:</strong> gamma tables kasują się po uśpieniu ekranu.
+Do automatycznego ponawiania służy drugi plik, <code>colorsync-reapply.py</code>
+(+ gotowy plik launchd w komplecie) — AI pokaże, jak go wpiąć, dwie komendy.</p>
+
+<h2>7 · Pułapki</h2>
+<ul>
+  <li><strong>Jasność w pomiarze ≠ jasność panelu.</strong> „Ciemniejszy w zdjęciu" przy niższym Brightness w OSD może być jaśniejszym panelem. Zawsze podawaj AI, jakie Brightness masz wpisane na każdym ekranie — przeliczy.</li>
+  <li><strong>Czerń laptopa</strong> zawsze będzie głębsza niż IPS-monitora — tego się nie wyrównuje. Wyrównuj biel i jasność.</li>
+  <li><strong>Dwa identyczne modele</strong> i tak różnią się fabrycznie o kilka procent (zużycie podświetlenia). To nie wina ustawień — właśnie po to jest korekta.</li>
+  <li><strong>Mora/prześwietlenie</strong> na zdjęciu: licz średnią (p50), nie pojedyncze piksele — AI zrobi to, jeśli prompt tego dopilnował.</li>
+</ul>
+
+<h2>Komplet plików</h2>
+<table class="files">
+  <tr><td><code>wzorzec-color-sync-1920x1200.png</code></td><td>wzorzec: 11 pasów szarości + pola 100/50/25/0%</td></tr>
+  <tr><td><code>colorsync.py</code></td><td>korekta gamma per ekran na Macu (snapshot / apply / reset / status)</td></tr>
+  <tr><td><code>colorsync-reapply.py</code> + <code>com.mjoldak.colorsync-reapply.plist</code></td><td>auto-ponawianie korekty co 5 min (przetrwa uśpienie ekranu)</td></tr>
+</table>
+<p class="files">Metoda: zdjęcie obu ekranów w jednej ekspozycji → statystyki pól
+(średnia środka, nie cała łatka) → korekta jaśniejszego ekranu w dół → weryfikacja
+nowym zdjęciem. Ta sama pętla działa dla laptop + monitor i dla TV.</p>
+
+</body>
+</html>
