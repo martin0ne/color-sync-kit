@@ -3,9 +3,8 @@
 
 Launchd odpala to co 5 min: gdy system wyzeruje gamma tables
 (uśpienie ekranu, przełączenie trybów), korekty wracają same.
-Bezpieczne: apply liczy ZAWSZE ze snapshotu, więc powtórne nałożenie
-tych samych mnożników się nie kumuluje. Cisza przy braku ekranu
-(dock śpi) — kolejny cykl spróbuje ponownie.
+Cisza przy braku pliku stanu; nieistniejący ekran (dock śpi) da wpis
+`rc=2 BŁĄD...` w logu i ponowi próbę w kolejnym cyklu — to nie awaria.
 """
 import json
 import os
@@ -19,20 +18,27 @@ LOG = os.path.expanduser("~/.config/colorsync/reapply.log")
 if not os.path.exists(STATE):
     sys.exit(0)
 
-with open(STATE) as f:
-    st = json.load(f)
+try:
+    with open(STATE) as f:
+        st = json.load(f)
+except (json.JSONDecodeError, OSError):
+    # uszkodzony stan — nie awaryjuj w pętli, poczekaj na kolejny cykl
+    sys.exit(0)
 
 lines = []
 for key, v in st.get("applied", {}).items():
     rgb = v.get("rgb")
     if not rgb:
         continue
-    p = subprocess.run(
-        [sys.executable, COLORSYNC, "apply", key,
-         "--rgb", *[str(x) for x in rgb]],
-        capture_output=True, text=True, timeout=30,
-    )
-    lines.append(f"{key}: rc={p.returncode} {p.stdout.strip() or p.stderr.strip()}")
+    try:
+        p = subprocess.run(
+            [sys.executable, COLORSYNC, "apply", key,
+             "--rgb", *[str(x) for x in rgb]],
+            capture_output=True, text=True, timeout=30,
+        )
+        lines.append(f"{key}: rc={p.returncode} {p.stdout.strip() or p.stderr.strip()}")
+    except subprocess.TimeoutExpired:
+        lines.append(f"{key}: TIMEOUT 30s")
 
 if lines:
     from datetime import datetime

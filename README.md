@@ -37,10 +37,13 @@ Pierwsze `apply` robi automatyczny snapshot oryginalnych tablic — `reset` zaws
 Auto-odnawianie po uśpieniu ekranu:
 
 ```bash
-cp colorsync-reapply.py ~/bin/ 2>/dev/null || true
+mkdir -p ~/bin
+cp colorsync-reapply.py ~/bin/
 cp com.mjoldak.colorsync-reapply.plist ~/Library/LaunchAgents/
-# podmień TWOJ-USER na swoją nazwę użytkownika (polecenie `whoami` pokaże):
-sed -i '' "s/TWOJ-USER/$(whoami)/" ~/Library/LaunchAgents/com.mjoldak.colorsync-reapply.plist
+# podmień TWOJ-USER na swoją nazwę użytkownika i ścieżkę do python3
+# (`whoami` i `command -v python3` pokażą obie):
+sed -i '' "s/TWOJ-USER/$(whoami)/; s|/usr/local/bin/python3|$(command -v python3)|" \
+    ~/Library/LaunchAgents/com.mjoldak.colorsync-reapply.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.mjoldak.colorsync-reapply.plist
 ```
 
@@ -60,6 +63,7 @@ Pomiar: zdjęcie obu ekranów w jednej ekspozycji (telefon prostopadle, AE/AF lo
 
 - To **wyrównanie ekranów między sobą**, nie kalibracja do sRGB/DCI — do profesjonalnej pracy z foto: kalibrator hardware (~400–700 zł) + darmowy DisplayCAL.
 - Gamma tables kasują się po uśpieniu/resecie ekranu — stąd re-apply automat.
+- **Nie usuwaj `~/.config/colorsync/state.json` przy aktywnej korekcie**: pierwszy `apply` po utracie stanu zrobi snapshot już skorygowanych tablic i „stan fabryczny" przestanie być fabrycznym.
 - Czerń laptopa (OLED/mini-LED) zawsze będzie głębsza niż IPS-monitora — wyrównuj biel i jasność, nie czerń.
 
 ## Licencja

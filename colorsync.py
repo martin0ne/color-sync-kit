@@ -18,8 +18,8 @@ Przykłady:
   python3 ~/bin/colorsync.py snapshot
   python3 ~/bin/colorsync.py measure /sciezka/zdjecie.jpg \\
       --boxes "lewy:0.08,0.05,0.40,0.95;prawy:0.52,0.05,0.85,0.95" --ref lewy
-  python3 ~/bin/colorsync.py apply 3 --rgb 0.97,1.0,0.99
-  python3 ~/bin/colorsync.py apply 3 --dry-run --rgb 0.97,1.0,0.99
+  python3 ~/bin/colorsync.py apply 3 --rgb 0.97 1.0 0.99
+  python3 ~/bin/colorsync.py apply 3 --dry-run --rgb 0.97 1.0 0.99
   python3 ~/bin/colorsync.py reset 3
   python3 ~/bin/colorsync.py status
 """
@@ -34,8 +34,17 @@ def now(): return datetime.datetime.now().isoformat(timespec="seconds")
 
 def load_state():
     if os.path.exists(STATE_PATH):
-        with open(STATE_PATH) as f:
-            return json.load(f)
+        try:
+            with open(STATE_PATH) as f:
+                st = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            # uszkodzony/nieczytelny stan: backup i start od zera
+            os.replace(STATE_PATH, STATE_PATH + ".corrupt")
+            print(f"UWAGA: state.json uszkodzony -> {STATE_PATH}.corrupt; zaczynam od pustego stanu")
+            st = {}
+        st.setdefault("snapshots", {})
+        st.setdefault("applied", {})
+        return st
     return {"snapshots": {}, "applied": {}}
 
 
@@ -125,6 +134,10 @@ def cmd_snapshot(args):
 
 
 def cmd_apply(args):
+    for m in args.rgb:
+        if not (0 < m <= 1.0):
+            die(f"mnożniki RGB muszą być w zakresie (0, 1]; dostałem {args.rgb}. "
+                f"0 lub ujemne = czarny ekran, a >1 i tak ucina sufit tablicy (1.0).")
     st = load_state()
     key = str(args.display)
     ids = {str(d["id"]) for d in displays()}
@@ -151,10 +164,10 @@ def cmd_apply(args):
         return 0
 
     set_tables(args.display, *new)
-    # weryfikacja zapisu (nie ufamy err==0)
+    # weryfikacja zapisu (nie ufamy err==0): wszystkie 3 kanały na środku tablicy
     chk = get_tables(args.display)
     mid = len(chk[0]) // 2
-    ok = abs(chk[0][mid] - new[0][mid]) < 0.005
+    ok = all(abs(chk[i][mid] - new[i][mid]) < 0.005 for i in range(3))
     st["applied"][key] = {"rgb": args.rgb, "at": now(), "verified": ok}
     save_state(st)
     print(f"{'OK' if ok else 'NIEPOTWIERDZONE'}: display {args.display} rgb={args.rgb} "
@@ -174,7 +187,6 @@ def cmd_reset(args):
             print(f"OK: display {did} przywrócony ze snapshotu ({snap['saved']})")
         else:
             # brak snapshotu -> identyczność liniowa
-            n = ctypes.c_float
             r, g, b = get_tables(did)
             nch = len(r)
             lin = [i / (nch - 1) for i in range(nch)]
@@ -206,19 +218,29 @@ def cmd_measure(args):
     W, H = im.size
     results = {}
     for spec in args.boxes.split(";"):
-        name, box = spec.split(":")
-        x1, y1, x2, y2 = (float(v) for v in box.split(","))
+        if ":" not in spec:
+            die(f"zły format --boxes: '{spec}' (oczekiwano nazwa:x1,y1,x2,y2)")
+        name, box = spec.split(":", 1)
+        try:
+            x1, y1, x2, y2 = (float(v) for v in box.split(","))
+        except ValueError:
+            die(f"zły format --boxes: '{box}' (oczekiwano 4 liczby x1,y1,x2,y2)")
+        if not (0 <= x1 < x2 <= 1 and 0 <= y1 < y2 <= 1):
+            die(f"łatka '{name}': współrzędne muszą spełniać 0<=x1<x2<=1 i 0<=y1<y2<=1")
         c = im.crop((int(x1 * W), int(y1 * H), int(x2 * W), int(y2 * H)))
         # subsampling dla szybkości; p50 odporne na mory/OSD/refleksy punktowe
         px = c.load()
         cw, ch = c.size
+        if cw == 0 or ch == 0:
+            die(f"łatka '{name}': crop o zerowym rozmiarze — zdjęcie za małe na te współrzędne")
         step = max(1, (cw * ch) // 60000)
         vals = ([], [], [])
-        i = 0
         for yy in range(0, ch, max(1, int(step ** 0.5))):
             for xx in range(0, cw, max(1, int(step ** 0.5))):
                 p = px[xx, yy]
                 vals[0].append(p[0]); vals[1].append(p[1]); vals[2].append(p[2])
+        if not vals[0]:
+            die(f"łatka '{name}': pusta próbka — powiększ box")
         p50 = tuple(sorted(v)[len(v) // 2] for v in vals)
         results[name] = p50
     if args.ref and args.ref in results and len(results) > 1:
@@ -227,7 +249,12 @@ def cmd_measure(args):
         for name, p50 in results.items():
             if name == args.ref:
                 continue
-            dl = (sum(p50) / 3) / (sum(ref) / 3)
+            lum_ref = sum(ref) / 3
+            if lum_ref <= 0:
+                print(f"UWAGA: łatka referencyjna czarna (p50={ref}) — porównanie jasności "
+                      f"niemożliwe; użyj jaśniejszej łatki (np. pola 100%)")
+                continue
+            dl = (sum(p50) / 3) / lum_ref
             db = (p50[2] / max(1, p50[0])) / (ref[2] / max(1, ref[0]))
             print(f"{name}: p50 RGB={p50}  jasność vs ref: {dl:.3f}  "
                   f"(1.0=identyczna; <1 -> ciemniejszy)  ciepło vs ref: {db:.3f} "
