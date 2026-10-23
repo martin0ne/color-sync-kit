@@ -39,6 +39,8 @@ Auto-odnawianie po uśpieniu ekranu:
 ```bash
 cp colorsync-reapply.py ~/bin/ 2>/dev/null || true
 cp com.mjoldak.colorsync-reapply.plist ~/Library/LaunchAgents/
+# podmień TWOJ-USER na swoją nazwę użytkownika (polecenie `whoami` pokaże):
+sed -i '' "s/TWOJ-USER/$(whoami)/" ~/Library/LaunchAgents/com.mjoldak.colorsync-reapply.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.mjoldak.colorsync-reapply.plist
 ```
 
