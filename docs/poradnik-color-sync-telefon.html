@@ -96,9 +96,9 @@ Górna połowa każdego ekranu to 11 pionowych pasów szarości od 0% do 100%,
 dolna połowa to 4 duże pola: 100% (biel), 50% (szarość), 25%, 0% (czerń).
 
 Zrób dla KAŻDEGO ekranu (nazwij je LEWY i PRAWY):
-1. Średnia jasność pola 100% (biel) — próbkuje tylko ze środka pola
+1. Mediana jasności pola 100% (biel) — próbkuje tylko ze środka pola
    (środkowe 40% powierzchni, pomiń krawędzie i sąsiedztwo pasów).
-2. Średnia jasność pola 50% — tak samo, ze środka.
+2. Mediana jasności pola 50% — tak samo, ze środka.
 3. Z punktu bieli: czy LEWY jest cieplejszy (więcej R) czy zimniejszy
    (więcej B) niż PRAWY, i o ile w procentach.
 
@@ -135,7 +135,7 @@ Do automatycznego ponawiania służy drugi plik, <code>colorsync-reapply.py</cod
   <li><strong>Jasność w pomiarze ≠ jasność panelu.</strong> „Ciemniejszy w zdjęciu" przy niższym Brightness w OSD może być jaśniejszym panelem. Zawsze podawaj AI, jakie Brightness masz wpisane na każdym ekranie — przeliczy.</li>
   <li><strong>Czerń laptopa</strong> zawsze będzie głębsza niż IPS-monitora — tego się nie wyrównuje. Wyrównuj biel i jasność.</li>
   <li><strong>Dwa identyczne modele</strong> i tak różnią się fabrycznie o kilka procent (zużycie podświetlenia). To nie wina ustawień — właśnie po to jest korekta.</li>
-  <li><strong>Mora/prześwietlenie</strong> na zdjęciu: licz średnią (p50), nie pojedyncze piksele — AI zrobi to, jeśli prompt tego dopilnował.</li>
+  <li><strong>Mora/prześwietlenie</strong> na zdjęciu: licz medianę (p50), nie średnią i nie pojedyncze piksele — AI zrobi to, jeśli prompt tego dopilnował.</li>
 </ul>
 
 <h2>Komplet plików</h2>

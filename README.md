@@ -1,6 +1,6 @@
 # color-sync-kit
 
-Dopasowanie kolorów i jasności dwóch (lub więcej) ekranów **bez kalibratora sprzętowego** — telefon jako miernik, AI jako matematyk, skrypt jako „f.lux na sterydach".
+Dopasowanie kolorów i jasności dwóch (lub więcej) ekranów **bez kalibratora sprzętowego** — telefon jako miernik, AI jako matematyk, skrypt jako systemowy filtr punktu bieli.
 
 Powstało, gdy dwa identyczne monitory Dell U2415 za dokiem Thunderbolt odmawiały współpracy z DDC/CI, a kalibrator kosztował tyle, co pół monitora.
 
